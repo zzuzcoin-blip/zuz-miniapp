@@ -56,6 +56,9 @@
         .modal-content { background: #1A1A1A; border: 1px solid #D4AF37; border-radius: 24px; padding: 20px; max-width: 300px; text-align: center; }
         .toast { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #D4AF37; color: #0A0A0A; padding: 12px; border-radius: 40px; text-align: center; z-index: 4000; display: none; font-weight: bold; }
         .reset-pin-btn { background: transparent; border: 1px solid #D4AF37; color: #D4AF37; padding: 8px 16px; border-radius: 40px; margin-top: 20px; cursor: pointer; font-size: 12px; }
+        .wallet-selector { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+        .wallet-option { background: #1A1A1A; border: 1px solid #D4AF37; border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .wallet-option img { width: 24px; height: 24px; }
     </style>
 </head>
 <body>
@@ -159,7 +162,11 @@
     const ETH_PRICE_USD = 3500;
     const ZUZ_PRICE_USD = 0.01;
 
-    // ========== СИСТЕМА PIN-КОДА (сохраняется в localStorage) ==========
+    // Определение мобильного устройства
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTelegram = window.Telegram?.WebApp !== undefined;
+
+    // ========== СИСТЕМА PIN-КОДА ==========
     let savedPin = localStorage.getItem('zuz_user_pin');
     let isCreatingPin = false;
 
@@ -174,12 +181,10 @@
 
     function checkPin() {
         if (!savedPin) {
-            // Нет PIN-кода → режим создания
             isCreatingPin = true;
             pinTitle.innerText = '✨ Создайте PIN-код (4 цифры)';
             clearPinInput();
         } else {
-            // Есть PIN-код → режим входа
             isCreatingPin = false;
             pinTitle.innerText = '🔐 Введите PIN-код';
             clearPinInput();
@@ -214,7 +219,6 @@
         loadUserData();
     }
 
-    // Сброс PIN-кода (потребуется создать новый)
     function resetPin() {
         if (confirm('⚠️ Сбросить PIN-код? После этого нужно будет создать новый.')) {
             localStorage.removeItem('zuz_user_pin');
@@ -228,7 +232,6 @@
 
     document.getElementById('resetPinBtn').onclick = resetPin;
 
-    // Обработка клавиш PIN-панели
     document.querySelectorAll('.pin-key').forEach(key => {
         key.onclick = () => {
             let num = key.dataset.num;
@@ -248,8 +251,98 @@
         };
     });
 
-    // ========== ОСНОВНОЙ ФУНКЦИОНАЛ ==========
+    // ========== ПОДКЛЮЧЕНИЕ КОШЕЛЬКА (РАБОТАЕТ НА ТЕЛЕФОНАХ!) ==========
     let web3 = null, account = null, tokenContract = null;
+
+    async function connectMetaMask() {
+        if (isMobile && !window.ethereum) {
+            // На телефоне без MetaMask App — открываем ссылку для установки
+            window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname;
+            return;
+        }
+        if (window.ethereum) {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                web3 = new Web3(window.ethereum);
+                tokenContract = new web3.eth.Contract([{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"}], TOKEN_ADDRESS);
+                document.getElementById('walletAddressDisplay').innerHTML = account.slice(0,6)+'...'+account.slice(-4);
+                document.getElementById('connectBtn').innerHTML = '✅ Подключён';
+                await updateBalances();
+                toast('Кошелёк подключён');
+            } catch(e) { toast('Ошибка подключения'); }
+        } else {
+            if (isMobile) {
+                window.location.href = 'https://metamask.app.link/dapp/' + window.location.host + window.location.pathname;
+            } else {
+                window.open('https://metamask.io/download/', '_blank');
+                toast('Установите MetaMask');
+            }
+        }
+    }
+
+    async function connectTrustWallet() {
+        if (isMobile) {
+            // Попытка вызвать Trust Wallet напрямую
+            const dappUrl = window.location.href;
+            window.location.href = `trust://open_url?url=${encodeURIComponent(dappUrl)}`;
+            setTimeout(() => {
+                if (!account) toast('Trust Wallet не найден. Установите приложение');
+            }, 2000);
+            return;
+        }
+        // Десктоп — используем расширение
+        if (window.ethereum && window.ethereum.isTrust) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            account = accounts[0];
+            web3 = new Web3(window.ethereum);
+            tokenContract = new web3.eth.Contract([{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"}], TOKEN_ADDRESS);
+            document.getElementById('walletAddressDisplay').innerHTML = account.slice(0,6)+'...'+account.slice(-4);
+            document.getElementById('connectBtn').innerHTML = '✅ Подключён';
+            await updateBalances();
+            toast('Trust Wallet подключён');
+        } else {
+            toast('Trust Wallet не обнаружен');
+        }
+    }
+
+    async function connectWalletConnect() {
+        toast('WalletConnect настройка...');
+        // Упрощённый вариант — показываем QR для десктопа
+        if (!isMobile) {
+            alert('Для мобильных устройств используйте MetaMask или Trust Wallet');
+        } else {
+            toast('На телефоне используйте MetaMask или Trust Wallet');
+        }
+    }
+
+    // Главная кнопка подключения — показывает выбор
+    document.getElementById('connectBtn').onclick = () => {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3 style="color:#D4AF37; margin-bottom:15px;">Выберите кошелёк</h3>
+                <div class="wallet-selector">
+                    <div class="wallet-option" onclick="window.connectMetaMask(); closeModal();">
+                        <span>🦊 MetaMask</span>
+                    </div>
+                    <div class="wallet-option" onclick="window.connectTrustWallet(); closeModal();">
+                        <span>📱 Trust Wallet</span>
+                    </div>
+                </div>
+                <button class="btn-small btn-secondary" onclick="closeModal()" style="margin-top:15px;">Закрыть</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        window.closeModal = () => modal.remove();
+    };
+
+    window.connectMetaMask = connectMetaMask;
+    window.connectTrustWallet = connectTrustWallet;
+
+    // ========== ОСТАЛЬНОЙ ФУНКЦИОНАЛ ==========
     let showBalance = true;
     let userData = {
         balanceZuz: 0, stakedZuz: 0, stakingRewards: 0,
@@ -267,20 +360,6 @@
         { name: "⚔️ Power", threshold: 100000, bonus: 25, next: 250000 },
         { name: "👑 Immortality", threshold: 250000, bonus: 30, next: Infinity }
     ];
-
-    async function connectWallet() {
-        if (!window.ethereum) { toast('Установите MetaMask или Trust Wallet'); return; }
-        try {
-            let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            account = accounts[0];
-            web3 = new Web3(window.ethereum);
-            tokenContract = new web3.eth.Contract([{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"}], TOKEN_ADDRESS);
-            document.getElementById('walletAddressDisplay').innerHTML = account.slice(0,6)+'...'+account.slice(-4);
-            document.getElementById('connectBtn').innerHTML = '✅ Подключён';
-            await updateBalances();
-            toast('Кошелёк подключён');
-        } catch(e) { toast('Ошибка подключения'); }
-    }
 
     async function updateBalances() {
         if (!web3 || !account) return;
@@ -314,7 +393,7 @@
     }
 
     async function buyZUZ(ethAmount) {
-        if(!account) { toast('Подключите кошелёк'); connectWallet(); return; }
+        if(!account) { toast('Подключите кошелёк'); document.getElementById('connectBtn').click(); return; }
         if(ethAmount < 0.01) { toast('Минимум 0.01 ETH'); return; }
         let wei = web3.utils.toWei(ethAmount.toString(), 'ether');
         try {
@@ -325,7 +404,6 @@
         } catch(e) { toast('Ошибка транзакции'); }
     }
 
-    document.getElementById('connectBtn').onclick = connectWallet;
     document.getElementById('toggleBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
     document.getElementById('toggleTotalBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
     document.getElementById('copyAddressBtn').onclick = () => { if(account) navigator.clipboard.writeText(account); toast('Адрес скопирован'); };
@@ -351,7 +429,7 @@
         let html = `<h4 style="color:#D4AF37;">🤝 Партнёрская программа</h4><p>Ваши активные партнёры: ${userData.totalReferrals}<br>Награда: 5% от покупок</p>
         <div class="expand-btn" id="toggleLevels">▼ Показать уровни</div>
         <div id="levelsTable" style="display:none;"><table class="level-table"><tr><th>Уровень</th><th>Активных партнёров</th><th>Бонус</th></tr>`;
-        levels.forEach((l,i) => { html += `<tr><td>${i+1}</td><td>${l.min}+</td><td>+${l.bonus}%</td></tr>`; });
+        levels.forEach((l,i) => { html += `<tr><td>${i+1}</td><td>${l.min}+</td><td>+${l.bonus}%</td>`; });
         html += `</table></div><div class="address" id="refLinkPlace"></div>`;
         document.getElementById('partnersContent').innerHTML = html;
         document.getElementById('refLinkPlace').innerHTML = `🔗 Ваша ссылка: t.me/Zuz_Universe_bot?start=${account?.slice(-6) || '123'}`;
@@ -379,7 +457,6 @@
     async function loadUserData() { await updateBalances(); }
     setInterval(() => { if(account) updateBalances(); }, 15000);
 
-    // Запуск проверки PIN-кода при загрузке
     checkPin();
 </script>
 </body>
