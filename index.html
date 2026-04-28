@@ -10,43 +10,13 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
-
         body {
             background: #0A0A0A;
-            color: #FFFFFF;
-            font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: white;
+            font-family: system-ui, -apple-system, sans-serif;
             min-height: 100vh;
-            padding: 0 0 80px 0;
         }
-
-        /* ========== АНИМАЦИИ ========== */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .animate-fade { animation: fadeIn 0.3s ease-out; }
-        .loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(212,175,55,0.3);
-            border-top-color: #D4AF37;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-
-        /* ========== PIN-КОД ЭКРАН ========== */
         .pin-screen {
             position: fixed;
             top: 0;
@@ -61,6 +31,24 @@
             align-items: center;
             padding: 20px;
         }
+        .video-container {
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        video {
+            width: 100%;
+            display: block;
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
         .pin-dots {
             display: flex;
             gap: 20px;
@@ -71,7 +59,6 @@
             height: 20px;
             background: #333;
             border-radius: 50%;
-            transition: all 0.2s;
         }
         .pin-dot.filled {
             background: #D4AF37;
@@ -83,7 +70,6 @@
             gap: 15px;
             max-width: 280px;
             width: 100%;
-            margin-top: 20px;
         }
         .pin-key {
             background: #1A1A1A;
@@ -95,157 +81,91 @@
             font-weight: bold;
             color: #D4AF37;
             cursor: pointer;
-            transition: all 0.1s;
         }
         .pin-key:active {
             background: #D4AF37;
             color: #0A0A0A;
-            transform: scale(0.95);
         }
-        .video-container {
-            width: 100%;
-            max-width: 300px;
-            margin-bottom: 20px;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        video {
-            width: 100%;
-            display: block;
-        }
-
-        /* ========== ОСНОВНОЕ ПРИЛОЖЕНИЕ ========== */
-        .app-container {
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 16px;
-        }
-
-        /* Карточки */
-        .card {
-            background: #1A1A1A;
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid #2A2A2A;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .gold-gradient {
-            background: linear-gradient(135deg, #D4AF37, #FFD700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Кнопки */
         .btn {
             background: #D4AF37;
             color: #0A0A0A;
             border: none;
-            padding: 14px 20px;
+            padding: 12px 24px;
             border-radius: 40px;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
-            width: 100%;
-            transition: all 0.2s;
-            text-align: center;
+            margin-top: 20px;
         }
-        .btn:active { transform: scale(0.97); background: #FFD700; }
-        .btn-secondary {
-            background: #2A2A2A;
-            color: #D4AF37;
-            border: 1px solid #D4AF37;
+        .app-container {
+            display: none;
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
         }
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 13px;
-            width: auto;
+        .card {
+            background: #1A1A1A;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #2A2A2A;
         }
-
-        /* Сетки */
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
         .action-card {
             background: #1A1A1A;
             border: 1px solid #2A2A2A;
-            border-radius: 20px;
-            padding: 16px 8px;
+            border-radius: 16px;
+            padding: 12px 4px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .action-card:active { transform: scale(0.96); border-color: #D4AF37; }
         .action-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 8px;
-            background: #0A0A0A;
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 6px;
         }
         .action-label {
-            font-size: 12px;
-            color: #D4AF37;
-            font-weight: 500;
-        }
-
-        /* Таблицы */
-        .level-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        .level-table th, .level-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #2A2A2A;
-        }
-        .level-table th {
+            font-size: 10px;
             color: #D4AF37;
         }
-
-        /* Tabs */
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .progress-bar {
+            background: #333;
+            height: 6px;
+            border-radius: 3px;
+            margin: 12px 0;
+        }
+        .progress-fill {
+            background: #D4AF37;
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+        }
         .tabs {
             display: flex;
             gap: 8px;
             background: #1A1A1A;
             padding: 8px;
-            border-radius: 60px;
-            margin-bottom: 20px;
+            border-radius: 40px;
+            margin-bottom: 16px;
         }
         .tab {
             flex: 1;
             text-align: center;
-            padding: 10px;
-            border-radius: 40px;
-            background: transparent;
-            color: #888;
+            padding: 8px;
+            border-radius: 30px;
             cursor: pointer;
         }
         .tab.active {
@@ -253,156 +173,46 @@
             color: #0A0A0A;
             font-weight: bold;
         }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* Баланс */
-        .balance-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
+        .tab-content {
+            display: none;
         }
-        .eye-icon {
-            cursor: pointer;
-            padding: 8px;
-        }
-        .progress-bar {
-            background: #333;
-            height: 6px;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-        .progress-fill {
-            background: linear-gradient(90deg, #D4AF37, #FFD700);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        .top-stats {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .stat-item {
-            text-align: center;
-            flex: 1;
-            padding: 12px;
-            background: #1A1A1A;
-            border-radius: 20px;
-            margin: 0 6px;
-            cursor: pointer;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #D4AF37;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #888;
-        }
-        .referral-expand {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        .referral-expand.show {
-            max-height: 2000px;
-        }
-        .back-button {
-            margin-bottom: 16px;
-            padding: 8px 0;
-            color: #D4AF37;
-            cursor: pointer;
-            display: inline-block;
-        }
-        .footer-banner {
-            background: linear-gradient(90deg, #D4AF37, #FFD700);
-            color: #0A0A0A;
-            text-align: center;
-            padding: 14px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .hidden-balance {
-            filter: blur(5px);
-            user-select: none;
-        }
-        .copy-icon, .qr-icon {
-            cursor: pointer;
-            margin-left: 8px;
-            opacity: 0.7;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .tab-content.active {
+            display: block;
         }
         .address {
             font-family: monospace;
             font-size: 12px;
             background: #0A0A0A;
-            padding: 8px 12px;
-            border-radius: 20px;
-            word-break: break-all;
+            padding: 8px;
+            border-radius: 16px;
+            margin-top: 8px;
         }
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin: 10px 0;
-        }
-        input {
-            flex: 1;
-            background: #0A0A0A;
-            border: 1px solid #333;
-            padding: 14px;
+        .footer-banner {
+            background: linear-gradient(90deg, #D4AF37, #FFD700);
+            color: #0A0A0A;
+            text-align: center;
+            padding: 12px;
             border-radius: 40px;
-            color: white;
-            font-size: 16px;
-        }
-        .amount-buttons {
-            display: flex;
-            gap: 10px;
-            margin: 10px 0;
-        }
-        .amount-btn {
-            flex: 1;
-            background: #2A2A2A;
-            border: none;
-            padding: 10px;
-            border-radius: 40px;
-            color: #D4AF37;
             font-weight: bold;
+            margin-top: 16px;
             cursor: pointer;
         }
-        .token-icon {
-            width: 24px;
-            height: 24px;
-            background: #D4AF37;
-            border-radius: 50%;
-            display: inline-block;
-            text-align: center;
-            line-height: 24px;
-            font-size: 12px;
-            margin-right: 8px;
+        .eye-icon {
+            cursor: pointer;
+            padding: 4px;
         }
     </style>
 </head>
 <body>
 
-<!-- PIN-КОД ЭКРАН С ВИДЕО -->
 <div id="pinScreen" class="pin-screen">
     <div class="video-container">
-        <video autoplay loop muted playsinline id="splashVideo">
+        <video autoplay loop muted playsinline>
             <source src="https://zuzim-universe.com/zzuz.mp4" type="video/mp4">
         </video>
     </div>
-    <h2 class="gold-gradient">Введите PIN-код</h2>
+    <div class="gold-gradient">ZUZ UNIVERSE</div>
+    <div style="color: #888; margin-bottom: 10px;">Введите PIN-код</div>
     <div class="pin-dots" id="pinDots">
         <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
@@ -412,322 +222,154 @@
         <div class="pin-key" data-num="7">7</div><div class="pin-key" data-num="8">8</div><div class="pin-key" data-num="9">9</div>
         <div class="pin-key" data-num="delete">⌫</div><div class="pin-key" data-num="0">0</div><div class="pin-key" data-num="enter">✓</div>
     </div>
-    <button class="btn btn-secondary" id="logoutPinBtn" style="margin-top: 20px; width: auto; padding: 10px 30px;">🔓 Выйти</button>
+    <button class="btn" id="logoutPinBtn">Выйти</button>
 </div>
 
-<!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
 <div id="appContainer" class="app-container">
-    <div class="container">
-        <!-- Шапка с логотипом -->
-        <div class="flex-between" style="margin-bottom: 20px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 48px; height: 48px; background: #000; border: 2px solid #D4AF37; border-radius: 60px; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: #D4AF37; font-size: 28px; font-weight: bold;">Z</span>
-                </div>
-                <div>
-                    <div style="font-size: 18px; font-weight: bold;">ZUZ UNIVERSE</div>
-                    <div style="font-size: 10px; color: #888;">Time > Money</div>
-                </div>
+    <div class="flex-between" style="margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 44px; height: 44px; background: #000; border: 2px solid #D4AF37; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <span style="color: #D4AF37; font-size: 24px;">Z</span>
             </div>
-            <div id="walletStatusBtn" class="btn-small btn-secondary" style="padding: 6px 12px;">🔌 Подключить</div>
+            <div><strong>ZUZ UNIVERSE</strong><br><span style="font-size: 10px; color: #888;">Time > Money</span></div>
         </div>
-
-        <!-- Три кнопки: Реварды | Участники | Партнёры -->
-        <div class="top-stats">
-            <div class="stat-item" id="rewardsStatBtn">
-                <div class="stat-value" id="rewardsAmount">0</div>
-                <div class="stat-label">Реварды (ZUZ)</div>
-            </div>
-            <div class="stat-item" id="membersStatBtn">
-                <div class="stat-value" id="membersCount">3475</div>
-                <div class="stat-label">Участники</div>
-            </div>
-            <div class="stat-item" id="partnersStatBtn">
-                <div class="stat-value" id="partnersCount">0</div>
-                <div class="stat-label">Партнёры</div>
-            </div>
-        </div>
-
-        <!-- Баланс стейкинга и награды -->
-        <div class="card">
-            <div class="balance-row">
-                <span>💰 Баланс стейкинга</span>
-                <span class="eye-icon" id="toggleBalanceBtn">👁️</span>
-            </div>
-            <div class="balance-row">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="token-icon">Z</span>
-                    <span id="stakingBalance" class="gold-gradient" style="font-size: 28px; font-weight: bold;">0</span>
-                </div>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" id="sageProgress"></div></div>
-            <div class="flex-between">
-                <span id="currentRank">🌱 Novice</span>
-                <span id="nextRankTarget" style="color: #888;">→ 1000 ZUZ</span>
-            </div>
-            <div class="balance-row" style="margin-top: 12px;">
-                <span>🎁 Награды стейкинга</span>
-                <span id="stakingRewards">0 ZUZ</span>
-            </div>
-        </div>
-
-        <!-- 8 КНОПОК -->
-        <div class="grid-4">
-            <div class="action-card" data-action="stake"><div class="action-icon">🔒</div><div class="action-label">Стейкинг</div></div>
-            <div class="action-card" data-action="liquidity"><div class="action-icon">💧</div><div class="action-label">Пул ликвидности</div></div>
-            <div class="action-card" data-action="dex"><div class="action-icon">🔄</div><div class="action-label">Обмен (DEX)</div></div>
-            <div class="action-card" data-action="newPartner"><div class="action-icon">👥+</div><div class="action-label">Новый партнёр</div></div>
-            <div class="action-card" data-action="claimStakeReward"><div class="action-icon">🎁</div><div class="action-label">Ревард стейкинга</div></div>
-            <div class="action-card" data-action="send"><div class="action-icon">✈️</div><div class="action-label">Отправить</div></div>
-            <div class="action-card" data-action="receive"><div class="action-icon">⬇️</div><div class="action-label">Получить</div></div>
-            <div class="action-card" data-action="partnerReward"><div class="action-icon">🤝</div><div class="action-label">Ревард парт. прог.</div></div>
-        </div>
-
-        <!-- Вывод стейкинга -->
-        <div class="card">
-            <div class="flex-between">
-                <span>📤 Вывод стейкинга</span>
-                <button class="btn-small btn-secondary" id="withdrawStakeBtn">Вывести</button>
-            </div>
-        </div>
-
-        <!-- Общий баланс $ -->
-        <div class="card">
-            <div class="flex-between">
-                <span>💵 Общий баланс</span>
-                <span id="totalBalanceUSD" class="gold-gradient" style="font-size: 24px; font-weight: bold;">$0.00</span>
-                <span class="eye-icon" id="toggleTotalBalanceBtn">👁️</span>
-            </div>
-        </div>
-
-        <!-- Вкладки -->
-        <div class="tabs">
-            <div class="tab active" data-tab="tokens">Токены</div>
-            <div class="tab" data-tab="nft">NFT</div>
-            <div class="tab" data-tab="activity">Активность</div>
-        </div>
-
-        <div id="tokensTab" class="tab-content active">
-            <div class="card">
-                <div class="balance-row"><span><span class="token-icon">Ξ</span> ETH</span><span id="ethBalance">0.00 ETH</span><span id="ethUSD">$0.00</span></div>
-                <div class="balance-row"><span><span class="token-icon">Z</span> ZUZ</span><span id="zuzBalance">0 ZUZ</span><span id="zuzUSD">$0.00</span></div>
-                <div class="balance-row"><span><span class="token-icon">₮</span> USDT</span><span id="usdtBalance">0.00 USDT</span><span id="usdtUSD">$0.00</span></div>
-            </div>
-            <div class="card">
-                <div class="flex-between"><span>🔗 Ваш адрес</span><span id="copyAddressBtn" class="copy-icon">📋 Копировать</span><span id="qrAddressBtn" class="qr-icon">📱 QR</span></div>
-                <div class="address" id="walletAddressDisplay">Не подключён</div>
-            </div>
-            <div class="card">
-                <div class="flex-between"><span>🛒 Купить ZUZ</span></div>
-                <div class="amount-buttons">
-                    <button class="amount-btn" data-amount="1">$1</button>
-                    <button class="amount-btn" data-amount="2">$2</button>
-                    <button class="amount-btn" data-amount="5">$5</button>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="customEthAmount" placeholder="Сумма в ETH" step="0.001">
-                    <button class="btn-small" id="buyEthBtn">Купить за ETH</button>
-                </div>
-                <div class="input-group">
-                    <input type="number" id="customUsdtAmount" placeholder="Сумма в USDT" step="1">
-                    <button class="btn-small" id="buyUsdtBtn">Купить за USDT</button>
-                </div>
-            </div>
-        </div>
-        <div id="nftTab" class="tab-content"><div class="card"><center>🎨 NFT коллекция скоро<br>7 мудрецов в цифре</center></div></div>
-        <div id="activityTab" class="tab-content"><div class="card" id="activityList">📭 Нет активности</div></div>
-
-        <!-- Баннер -->
-        <div class="footer-banner" id="siteBannerBtn">⚡ Станьте частью инновационной экосистемы → zuzim-universe.com</div>
+        <button class="btn" id="connectBtn" style="padding: 8px 16px; font-size: 12px;">🔌 Кошелёк</button>
     </div>
+
+    <div class="card">
+        <div class="balance-row"><span>💰 Баланс ZUZ</span><span class="eye-icon" id="toggleBalance">👁️</span></div>
+        <div class="balance-row"><span style="font-size: 28px; font-weight: bold;" id="zuzBalance">0</span><span id="stakingInfo">В стейкинге: 0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="sageProgress"></div></div>
+        <div class="balance-row"><span id="currentRank">🌱 Novice</span><span id="nextRank">→ 1000 ZUZ</span></div>
+    </div>
+
+    <div class="grid-4">
+        <div class="action-card"><div class="action-icon">🔒</div><div class="action-label">Стейкинг</div></div>
+        <div class="action-card"><div class="action-icon">💧</div><div class="action-label">Пул ликвидности</div></div>
+        <div class="action-card"><div class="action-icon">🔄</div><div class="action-label">Обмен DEX</div></div>
+        <div class="action-card"><div class="action-icon">👥</div><div class="action-label">Новый партнёр</div></div>
+        <div class="action-card"><div class="action-icon">🎁</div><div class="action-label">Ревард стейкинга</div></div>
+        <div class="action-card"><div class="action-icon">✈️</div><div class="action-label">Отправить</div></div>
+        <div class="action-card"><div class="action-icon">⬇️</div><div class="action-label">Получить</div></div>
+        <div class="action-card"><div class="action-icon">🤝</div><div class="action-label">Ревард партнёрки</div></div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="tokens">Токены</div>
+        <div class="tab" data-tab="nft">NFT</div>
+        <div class="tab" data-tab="activity">Активность</div>
+    </div>
+
+    <div id="tokensTab" class="tab-content active">
+        <div class="card">
+            <div class="balance-row"><span>ETH</span><span id="ethBalance">0.00 ETH</span></div>
+            <div class="balance-row"><span>ZUZ</span><span id="zuzBalance2">0 ZUZ</span></div>
+            <div class="balance-row"><span>USDT</span><span id="usdtBalance">0.00 USDT</span></div>
+            <div class="address" id="walletAddress">Не подключён</div>
+            <div class="flex-between" style="margin-top: 12px;"><span>Копировать</span><span>QR</span></div>
+        </div>
+        <div class="card">
+            <div class="flex-between"><span>🛒 Купить ZUZ</span></div>
+            <div class="flex-between" style="margin: 12px 0;">
+                <button class="btn" id="buy1">$1</button>
+                <button class="btn" id="buy2">$2</button>
+                <button class="btn" id="buy5">$5</button>
+            </div>
+        </div>
+    </div>
+    <div id="nftTab" class="tab-content"><div class="card" style="text-align: center;">🎨 NFT коллекция скоро</div></div>
+    <div id="activityTab" class="tab-content"><div class="card" style="text-align: center;">📭 Нет активности</div></div>
+
+    <div class="footer-banner" id="siteBtn">⚡ Станьте частью экосистемы → zuzim-universe.com</div>
 </div>
 
 <script>
-    // ========== КОНФИГУРАЦИЯ ==========
-    const TOKEN_ADDRESS = '0x87D336511760583B11B87866654c6f7253c1cB0D';
-    const PRESALE_ADDRESS = '0x8CdeBa5Db0a4046D8BBC655244173750c7DFd553';
-    const TOKEN_PRICE_ETH = 0.0001;
-    const WEBSITE = 'https://zuzim-universe.com';
     const CORRECT_PIN = '1234';
-
-    // Глобальные переменные
+    let pinInput = '';
     let web3 = null;
     let account = null;
-    let userStats = { balanceZuz: 0, stakedZuz: 0, stakingRewards: 0, referrals: [], totalReferrals: 0, partnerRewards: 0 };
     let showBalance = true;
-    let currentTab = 'tokens';
-    let isLoggedIn = false;
+    let userBalance = 1250;
+    let staked = 500;
 
-    // Эмуляция курсов (1 ZUZ = $0.01, 1 ETH = $3500, 1 USDT = $1)
-    const ETH_PRICE_USD = 3500;
-    const ZUZ_PRICE_USD = 0.01;
-    const USDT_PRICE_USD = 1;
-
-    // DOM элементы
+    const pinDots = document.querySelectorAll('.pin-dot');
     const pinScreen = document.getElementById('pinScreen');
     const appContainer = document.getElementById('appContainer');
-    const pinDots = document.querySelectorAll('.pin-dot');
-    let pinInput = '';
 
-    // Система рангов мудреца
-    const sageLevels = [
-        { name: "🌱 Novice", threshold: 0, bonus: 0, next: 1000 },
-        { name: "📜 Wisdom", threshold: 1000, bonus: 2, next: 5000 },
-        { name: "🌾 Prosperity", threshold: 5000, bonus: 5, next: 10000 },
-        { name: "🛡️ Protection", threshold: 10000, bonus: 10, next: 25000 },
-        { name: "⚡ Innovation", threshold: 25000, bonus: 15, next: 50000 },
-        { name: "☯️ Harmony", threshold: 50000, bonus: 20, next: 100000 },
-        { name: "⚔️ Power", threshold: 100000, bonus: 25, next: 250000 },
-        { name: "👑 Immortality", threshold: 250000, bonus: 30, next: Infinity }
-    ];
-
-    function getSageLevel(balance) {
-        for (let i = sageLevels.length - 1; i >= 0; i--) {
-            if (balance >= sageLevels[i].threshold) return sageLevels[i];
-        }
-        return sageLevels[0];
-    }
-
-    function updateSageUI() {
-        const balance = userStats.balanceZuz;
-        const sage = getSageLevel(balance);
-        document.getElementById('currentRank').innerHTML = sage.name;
-        let next = sageLevels.find(l => l.threshold > balance);
-        let percent = 0;
-        if (next) {
-            const prev = sage.threshold;
-            percent = ((balance - prev) / (next.threshold - prev)) * 100;
-            document.getElementById('nextRankTarget').innerHTML = `→ ${next.name}: ${next.threshold.toLocaleString()} ZUZ`;
-        } else {
-            percent = 100;
-            document.getElementById('nextRankTarget').innerHTML = `👑 Бессмертие`;
-        }
-        document.getElementById('sageProgress').style.width = Math.min(percent, 100) + '%';
-        document.getElementById('stakingBalance').innerText = userStats.stakedZuz.toLocaleString();
-        document.getElementById('stakingRewards').innerText = userStats.stakingRewards.toLocaleString() + ' ZUZ';
-        document.getElementById('rewardsAmount').innerText = userStats.stakingRewards.toLocaleString();
-        document.getElementById('partnersCount').innerText = userStats.totalReferrals;
-        updateTokenBalances();
-    }
-
-    async function updateTokenBalances() {
-        let eth = 0, zuz = 0, usdt = 0;
-        if (web3 && account) {
-            try {
-                const balanceWei = await web3.eth.getBalance(account);
-                eth = parseFloat(web3.utils.fromWei(balanceWei, 'ether'));
-                const tokenContract = new web3.eth.Contract([{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"}], TOKEN_ADDRESS);
-                const zuzWei = await tokenContract.methods.balanceOf(account).call();
-                zuz = parseFloat(web3.utils.fromWei(zuzWei, 'ether'));
-            } catch(e) { console.log(e); }
-        }
-        const totalUSD = (eth * ETH_PRICE_USD) + (zuz * ZUZ_PRICE_USD) + (userStats.stakedZuz * ZUZ_PRICE_USD);
-        document.getElementById('totalBalanceUSD').innerText = showBalance ? `$${totalUSD.toFixed(2)}` : '***';
-        document.getElementById('ethBalance').innerHTML = showBalance ? `${eth.toFixed(4)} ETH` : '***';
-        document.getElementById('zuzBalance').innerHTML = showBalance ? `${zuz.toLocaleString()} ZUZ` : '***';
-        document.getElementById('usdtBalance').innerHTML = showBalance ? `${usdt.toFixed(2)} USDT` : '***';
-    }
-
-    function updateUI() {
-        updateSageUI();
-        updateTokenBalances();
-    }
-
-    // PIN-код логика
     function updatePinDots() {
         pinDots.forEach((dot, i) => {
             if (i < pinInput.length) dot.classList.add('filled');
             else dot.classList.remove('filled');
         });
     }
+
     document.querySelectorAll('.pin-key').forEach(key => {
-        key.addEventListener('click', () => {
+        key.onclick = () => {
             const num = key.dataset.num;
             if (num === 'delete') { pinInput = pinInput.slice(0, -1); updatePinDots(); }
             else if (num === 'enter') {
                 if (pinInput === CORRECT_PIN) {
-                    isLoggedIn = true;
                     pinScreen.style.display = 'none';
                     appContainer.style.display = 'block';
-                    if (window.Telegram?.WebApp) window.Telegram.WebApp.ready();
                 } else { alert('Неверный PIN'); pinInput = ''; updatePinDots(); }
             }
             else if (pinInput.length < 4) { pinInput += num; updatePinDots(); }
-        });
+        };
     });
-    document.getElementById('logoutPinBtn').onclick = () => { isLoggedIn = false; pinScreen.style.display = 'flex'; appContainer.style.display = 'none'; pinInput = ''; updatePinDots(); };
 
-    // Подключение кошелька
-    async function connectWallet() {
-        if (window.ethereum) {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                account = accounts[0];
-                web3 = new Web3(window.ethereum);
-                document.getElementById('walletAddressDisplay').innerHTML = account.slice(0,6)+'...'+account.slice(-4);
-                document.getElementById('walletStatusBtn').innerHTML = '🔗 Подключён';
-                await updateTokenBalances();
-                alert('Кошелёк подключён!');
-            } catch(e) { alert('Ошибка подключения'); }
-        } else { alert('Установите MetaMask или Trust Wallet'); }
-    }
-    document.getElementById('walletStatusBtn').onclick = connectWallet;
-    document.getElementById('copyAddressBtn').onclick = () => { if(account) navigator.clipboard.writeText(account); alert('Адрес скопирован'); };
-    document.getElementById('qrAddressBtn').onclick = () => { alert('QR: '+account); };
-    document.getElementById('toggleBalanceBtn').onclick = () => { showBalance = !showBalance; updateUI(); };
-    document.getElementById('toggleTotalBalanceBtn').onclick = () => { showBalance = !showBalance; updateUI(); };
-
-    // Покупка
-    async function buyWithETH(usdAmount) {
-        if (!web3 || !account) { alert('Подключите кошелёк'); return; }
-        const ethNeeded = usdAmount / ETH_PRICE_USD;
-        const zuzAmount = ethNeeded / TOKEN_PRICE_ETH;
-        const wei = web3.utils.toWei(ethNeeded.toString(), 'ether');
-        try {
-            await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: account, to: PRESALE_ADDRESS, value: wei }] });
-            alert(`✅ Куплено ${zuzAmount.toFixed(0)} ZUZ за $${usdAmount}`);
-            userStats.balanceZuz += zuzAmount;
-            updateUI();
-        } catch(e) { alert('Ошибка'); }
-    }
-    document.querySelectorAll('.amount-btn').forEach(btn => {
-        btn.onclick = () => buyWithETH(parseInt(btn.dataset.amount));
-    });
-    document.getElementById('buyEthBtn').onclick = async () => {
-        let val = document.getElementById('customEthAmount').value;
-        if(!val) return;
-        const usd = parseFloat(val) * ETH_PRICE_USD;
-        buyWithETH(usd);
+    document.getElementById('logoutPinBtn').onclick = () => {
+        pinScreen.style.display = 'flex';
+        appContainer.style.display = 'none';
+        pinInput = '';
+        updatePinDots();
     };
-    document.getElementById('buyUsdtBtn').onclick = () => { alert('Покупка за USDT через агрегатор (в разработке)'); };
 
-    // Действия кнопок
+    document.getElementById('connectBtn').onclick = async () => {
+        if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            account = accounts[0];
+            web3 = new Web3(window.ethereum);
+            document.getElementById('walletAddress').innerHTML = account.slice(0,6)+'...'+account.slice(-4);
+            alert('Кошелёк подключён');
+        } else { alert('Установите MetaMask'); }
+    };
+
+    document.getElementById('toggleBalance').onclick = () => {
+        showBalance = !showBalance;
+        const balEl = document.getElementById('zuzBalance');
+        balEl.innerText = showBalance ? userBalance : '***';
+        document.getElementById('zuzBalance2').innerHTML = showBalance ? userBalance+' ZUZ' : '***';
+    };
+
+    document.getElementById('buy1').onclick = () => alert('Покупка ZUZ за $1 (0.000285 ETH)');
+    document.getElementById('buy2').onclick = () => alert('Покупка ZUZ за $2 (0.00057 ETH)');
+    document.getElementById('buy5').onclick = () => alert('Покупка ZUZ за $5 (0.00142 ETH)');
+    document.getElementById('siteBtn').onclick = () => window.open('https://zuzim-universe.com', '_blank');
+
     document.querySelectorAll('.action-card').forEach(card => {
-        card.onclick = () => alert(`Функция "${card.querySelector('.action-label').innerText}" будет доступна после пресейла`);
+        card.onclick = () => alert(`Функция "${card.querySelector('.action-label').innerText}" будет после пресейла`);
     });
-    document.getElementById('withdrawStakeBtn').onclick = () => alert('Вывод стейкинга после пресейла');
-    document.getElementById('siteBannerBtn').onclick = () => window.open(WEBSITE, '_blank');
-    document.getElementById('rewardsStatBtn').onclick = () => alert(`Ваши реварды: ${userStats.stakingRewards} ZUZ`);
-    document.getElementById('membersStatBtn').onclick = () => alert('Сообщество растёт!');
-    document.getElementById('partnersStatBtn').onclick = () => alert('Приглашайте друзей и получайте 5%');
 
-    // Tab logic
     document.querySelectorAll('.tab').forEach(tab => {
         tab.onclick = () => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
-            currentTab = tab.dataset.tab;
         };
     });
 
-    // Инициализация пользователя
-    userStats.balanceZuz = 1250;
-    userStats.stakedZuz = 500;
-    userStats.stakingRewards = 25;
-    userStats.totalReferrals = 3;
-    updateUI();
+    function updateSage() {
+        let rank = '🌱 Novice';
+        let percent = (userBalance / 1000) * 100;
+        if (userBalance >= 1000) rank = '📜 Wisdom';
+        if (userBalance >= 5000) rank = '🌾 Prosperity';
+        document.getElementById('currentRank').innerHTML = rank;
+        document.getElementById('sageProgress').style.width = Math.min(percent, 100) + '%';
+    }
+    updateSage();
+    document.getElementById('zuzBalance').innerText = userBalance;
+    document.getElementById('zuzBalance2').innerHTML = userBalance+' ZUZ';
 </script>
 </body>
 </html>
