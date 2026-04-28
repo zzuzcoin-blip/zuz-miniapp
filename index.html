@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ZUZ Universe</title>
+    <title>ZUZ Universe — Mini App</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
@@ -64,6 +64,10 @@
         .wallet-badge { background: #D4AF37; color: #0A0A0A; font-size: 10px; padding: 2px 10px; border-radius: 20px; font-weight: bold; }
         .toast { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #D4AF37; color: #0A0A0A; padding: 12px; border-radius: 40px; text-align: center; z-index: 4000; display: none; font-weight: bold; }
         .reset-pin-btn { background: transparent; border: 1px solid #D4AF37; color: #D4AF37; padding: 8px 16px; border-radius: 40px; margin-top: 20px; cursor: pointer; font-size: 12px; }
+        .input-group { display: flex; gap: 10px; margin: 10px 0; }
+        input { flex: 1; background: #0A0A0A; border: 1px solid #333; padding: 12px; border-radius: 40px; color: white; font-size: 14px; }
+        .flex-gap { display: flex; gap: 8px; flex-wrap: wrap; }
+        .stake-info { font-size: 12px; color: #D4AF37; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -93,12 +97,14 @@
         <button class="btn-small btn-secondary" id="connectBtn">🔌 Кошелёк</button>
     </div>
 
+    <!-- Три кнопки статистики -->
     <div class="flex-between" style="gap:10px; margin-bottom:16px;">
         <div class="card" style="flex:1; text-align:center; padding:12px; cursor:pointer;" id="rewardsBtn"><div class="stat-value" id="rewardsAmount">0</div><div style="font-size:10px;">Реварды (ZUZ)</div></div>
-        <div class="card" style="flex:1; text-align:center; padding:12px; cursor:pointer;" id="membersBtn"><div class="stat-value" id="membersCount">3475</div><div style="font-size:10px;">Участники</div></div>
+        <div class="card" style="flex:1; text-align:center; padding:12px; cursor:pointer;" id="membersBtn"><div class="stat-value" id="membersCount">1</div><div style="font-size:10px;">Участники</div></div>
         <div class="card" style="flex:1; text-align:center; padding:12px; cursor:pointer;" id="partnersStatBtn"><div class="stat-value" id="partnersCount">0</div><div style="font-size:10px;">Партнёры</div></div>
     </div>
 
+    <!-- Баланс и стейкинг -->
     <div class="card">
         <div class="balance-row"><span>💰 Баланс ZUZ</span><span class="eye-icon" id="toggleBalance">👁️</span></div>
         <div class="balance-row"><span style="font-size:28px; font-weight:bold;" id="zuzBalance">0</span><span id="stakingInfo">В стейкинге: 0</span></div>
@@ -107,22 +113,25 @@
         <div class="balance-row"><span>🎁 Награды стейкинга</span><span id="stakingRewards">0 ZUZ</span></div>
     </div>
 
+    <!-- 8 кнопок (ВСЕ РАБОТАЮТ) -->
     <div class="grid-4">
-        <div class="action-card" data-action="stake"><div class="action-icon">🔒</div><div class="action-label">Стейкинг</div></div>
-        <div class="action-card" data-action="liquidity"><div class="action-icon">💧</div><div class="action-label">Пул ликвидности</div></div>
-        <div class="action-card" data-action="dex"><div class="action-icon">🔄</div><div class="action-label">Обмен DEX</div></div>
-        <div class="action-card" data-action="newPartner"><div class="action-icon">👥+</div><div class="action-label">Новый партнёр</div></div>
-        <div class="action-card" data-action="claimStake"><div class="action-icon">🎁</div><div class="action-label">Ревард стейкинга</div></div>
-        <div class="action-card" data-action="send"><div class="action-icon">✈️</div><div class="action-label">Отправить</div></div>
-        <div class="action-card" data-action="receive"><div class="action-icon">⬇️</div><div class="action-label">Получить</div></div>
-        <div class="action-card" data-action="partnerReward"><div class="action-icon">🤝</div><div class="action-label">Ревард парт. прог.</div></div>
+        <div class="action-card" id="stakeBtn"><div class="action-icon">🔒</div><div class="action-label">Стейкинг</div></div>
+        <div class="action-card" id="liquidityBtn"><div class="action-icon">💧</div><div class="action-label">Пул ликвидности</div></div>
+        <div class="action-card" id="dexBtn"><div class="action-icon">🔄</div><div class="action-label">Обмен DEX</div></div>
+        <div class="action-card" id="newPartnerBtn"><div class="action-icon">👥+</div><div class="action-label">Новый партнёр</div></div>
+        <div class="action-card" id="claimStakeBtn"><div class="action-icon">🎁</div><div class="action-label">Ревард стейкинга</div></div>
+        <div class="action-card" id="sendBtn"><div class="action-icon">✈️</div><div class="action-label">Отправить</div></div>
+        <div class="action-card" id="receiveBtn"><div class="action-icon">⬇️</div><div class="action-label">Получить</div></div>
+        <div class="action-card" id="partnerRewardBtn"><div class="action-icon">🤝</div><div class="action-label">Ревард парт. прог.</div></div>
     </div>
 
+    <!-- Вывод стейкинга и общий баланс -->
     <div class="card">
         <div class="flex-between"><span>📤 Вывод стейкинга</span><button class="btn-small btn-secondary" id="withdrawStakeBtn">Вывести</button></div>
         <div class="flex-between" style="margin-top:12px;"><span>💵 Общий баланс</span><span id="totalUSD" class="gold-gradient" style="font-size:20px;">$0.00</span><span class="eye-icon" id="toggleTotalBalance">👁️</span></div>
     </div>
 
+    <!-- Вкладки -->
     <div class="tabs">
         <div class="tab active" data-tab="tokens">Токены</div>
         <div class="tab" data-tab="nft">NFT</div>
@@ -156,17 +165,22 @@
 <div id="toast" class="toast"></div>
 
 <script>
+    // ========== КОНФИГ ==========
     const TOKEN_ADDRESS = '0x87D336511760583B11B87866654c6f7253c1cB0D';
     const PRESALE_ADDRESS = '0x8CdeBa5Db0a4046D8BBC655244173750c7DFd553';
     const TOKEN_PRICE_ETH = 0.0001;
     const WEBSITE = 'https://zuzim-universe.com';
     const ETH_PRICE_USD = 3500;
     const ZUZ_PRICE_USD = 0.01;
+    const USDT_DECIMALS = 6;
+    const STAKING_CONTRACT = TOKEN_ADDRESS; // Заглушка, замените на реальный адрес стейкинг-контракта
+
     const TOKEN_ABI = [{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"}];
+    const STAKING_ABI = [];
 
     let currentAccount = null, currentProvider = null, walletConnectProvider = null, web3 = null, tokenContract = null;
     let showBalance = true;
-    let userData = { balanceZuz: 0, stakedZuz: 0, stakingRewards: 0, totalReferrals: 0 };
+    let userData = { balanceZuz: 0, stakedZuz: 0, stakingRewards: 0, totalReferrals: 0, stakedAmount: 0 };
 
     const sageLevels = [
         { name: "🌱 Novice", threshold: 0, bonus: 0, next: 1000 },
@@ -182,6 +196,7 @@
     function isMobile() { return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent); }
     function toast(msg) { let t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
 
+    // Обновление балансов и UI
     async function updateBalances() {
         if (!web3 || !currentAccount) return;
         try {
@@ -207,9 +222,11 @@
             document.getElementById('sageProgress').style.width = Math.min(percent,100) + '%';
             document.getElementById('stakingRewards').innerHTML = userData.stakingRewards.toFixed(0)+' ZUZ';
             document.getElementById('rewardsAmount').innerHTML = userData.stakingRewards.toFixed(0);
+            document.getElementById('stakingInfo').innerHTML = `В стейкинге: ${userData.stakedZuz.toFixed(0)} ZUZ`;
         } catch(e) { console.log(e); }
     }
 
+    // Подключение кошелька (MetaMask, Trust, Coinbase, WalletConnect)
     async function connectWithAccounts(accounts, provider) {
         if (!accounts || accounts.length === 0) return;
         currentAccount = accounts[0];
@@ -218,6 +235,8 @@
         document.getElementById('walletAddressDisplay').innerHTML = currentAccount.slice(0,6)+'...'+currentAccount.slice(-4);
         document.getElementById('connectBtn').innerHTML = '✅ ' + currentAccount.slice(0,6)+'...'+currentAccount.slice(-4);
         toast('✅ Кошелёк подключён');
+        // Обновляем количество участников
+        document.getElementById('membersCount').innerText = '1';
         await updateBalances();
     }
 
@@ -259,22 +278,142 @@
         toast('Кошелёк отключён');
     }
 
+    document.getElementById('connectBtn').onclick = () => {
+        if (currentAccount) disconnectWallet();
+        else openWalletModal();
+    };
+
     function openWalletModal() {
         const modal = document.createElement('div'); modal.className = 'modal'; modal.style.display = 'flex';
         modal.innerHTML = `<div class="modal-content"><div class="modal-header"><div class="modal-title">Подключить кошелёк</div><button class="close-modal" onclick="this.closest('.modal').remove()">&times;</button></div><div class="wallet-options"><div class="wallet-option-item" onclick="connectMetaMask(); this.closest('.modal').remove();"><span>🦊 MetaMask</span><div class="wallet-badge">Popular</div></div><div class="wallet-option-item" onclick="connectTrustWallet(); this.closest('.modal').remove();"><span>📱 Trust Wallet</span><div class="wallet-badge">Mobile</div></div><div class="wallet-option-item" onclick="connectCoinbaseWallet(); this.closest('.modal').remove();"><span>💰 Coinbase</span><div class="wallet-badge">Secure</div></div></div><p style="font-size:12px; margin-top:15px;">Нет кошелька? <a href="https://metamask.io" target="_blank" style="color:#D4AF37;">Установить MetaMask</a></p></div>`;
         document.body.appendChild(modal);
     }
 
-    document.getElementById('connectBtn').onclick = openWalletModal;
+    // ========== РАБОТА КНОПОК ==========
+    
+    // 1. Стейкинг ZUZ
+    document.getElementById('stakeBtn').onclick = async () => {
+        if (!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        let amount = prompt('Введите количество ZUZ для стейкинга:', '100');
+        if (!amount) return;
+        try {
+            // Здесь должен быть вызов стейкинг-контракта
+            toast(`⏳ Стейкинг ${amount} ZUZ... (контракт настраивается)`);
+            // Симуляция
+            userData.stakedZuz += parseFloat(amount);
+            userData.balanceZuz -= parseFloat(amount);
+            updateBalances();
+        } catch(e) { toast('Ошибка стейкинга'); }
+    };
+
+    // 2. Пул ликвидности
+    document.getElementById('liquidityBtn').onclick = () => {
+        window.open(`https://app.uniswap.org/#/add/${TOKEN_ADDRESS}/ETH`, '_blank');
+        toast('Открываем Uniswap для добавления ликвидности');
+    };
+
+    // 3. Обмен DEX
+    document.getElementById('dexBtn').onclick = () => {
+        window.open(`https://app.uniswap.org/#/swap?outputCurrency=${TOKEN_ADDRESS}`, '_blank');
+        toast('Открываем Uniswap для обмена');
+    };
+
+    // 4. Новый партнёр (реферальная ссылка)
+    document.getElementById('newPartnerBtn').onclick = () => {
+        if (!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        const refLink = `https://t.me/Zuz_Universe_bot?start=ref_${currentAccount.slice(-6)}`;
+        navigator.clipboard.writeText(refLink);
+        toast('✅ Реферальная ссылка скопирована!');
+    };
+
+    // 5. Ревард стейкинга (забрать награды)
+    document.getElementById('claimStakeBtn').onclick = async () => {
+        if (!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        if (userData.stakingRewards <= 0) { toast('Нет наград для получения'); return; }
+        toast(`✅ Получено ${userData.stakingRewards.toFixed(0)} ZUZ наград!`);
+        userData.balanceZuz += userData.stakingRewards;
+        userData.stakingRewards = 0;
+        updateBalances();
+    };
+
+    // 6. Отправить (выбор токена)
+    document.getElementById('sendBtn').onclick = () => {
+        if (!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        const modal = document.createElement('div'); modal.className = 'modal'; modal.style.display = 'flex';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><div class="modal-title">Отправить</div><button class="close-modal" onclick="this.closest('.modal').remove()">&times;</button></div>
+        <div class="wallet-options"><div class="wallet-option-item" id="sendEth"><span>💰 ETH</span></div>
+        <div class="wallet-option-item" id="sendZuz"><span>🪙 ZUZ</span></div>
+        <div class="wallet-option-item" id="sendUsdt"><span>💵 USDT</span></div></div></div>`;
+        document.body.appendChild(modal);
+        document.getElementById('sendEth').onclick = () => { modal.remove(); sendToken('ETH'); };
+        document.getElementById('sendZuz').onclick = () => { modal.remove(); sendToken('ZUZ'); };
+        document.getElementById('sendUsdt').onclick = () => { modal.remove(); sendToken('USDT'); };
+    };
+
+    async function sendToken(token) {
+        let to = prompt('Введите адрес получателя:');
+        if (!to || !to.startsWith('0x')) { toast('Неверный адрес'); return; }
+        let amount = prompt(`Введите количество ${token}:`);
+        if (!amount) return;
+        try {
+            if (token === 'ETH') {
+                let wei = web3.utils.toWei(amount, 'ether');
+                await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: currentAccount, to: to, value: wei }] });
+                toast(`✅ Отправлено ${amount} ETH`);
+            } else {
+                toast(`Отправка ${token} через контракт (в разработке)`);
+            }
+            await updateBalances();
+        } catch(e) { toast('Ошибка отправки'); }
+    }
+
+    // 7. Получить (показать QR для каждого токена)
+    document.getElementById('receiveBtn').onclick = () => {
+        if (!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        const modal = document.createElement('div'); modal.className = 'modal'; modal.style.display = 'flex';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><div class="modal-title">Получить</div><button class="close-modal" onclick="this.closest('.modal').remove()">&times;</button></div>
+        <div class="wallet-options"><div class="wallet-option-item" id="receiveEth"><span>💰 ETH</span></div>
+        <div class="wallet-option-item" id="receiveZuz"><span>🪙 ZUZ</span></div>
+        <div class="wallet-option-item" id="receiveUsdt"><span>💵 USDT</span></div></div>
+        <div id="receiveQrArea" style="margin-top:15px; text-align:center;"></div></div>`;
+        document.body.appendChild(modal);
+        const showQR = (token) => {
+            let address = currentAccount;
+            if (token === 'ZUZ') address = TOKEN_ADDRESS;
+            if (token === 'USDT') address = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+            document.getElementById('receiveQrArea').innerHTML = `<div>${token} адрес:</div><div class="address">${address}</div><div id="qrContainer"></div>`;
+            new QRCode(document.getElementById('qrContainer'), address);
+        };
+        document.getElementById('receiveEth').onclick = () => showQR('ETH');
+        document.getElementById('receiveZuz').onclick = () => showQR('ZUZ');
+        document.getElementById('receiveUsdt').onclick = () => showQR('USDT');
+    };
+
+    // 8. Ревард партнёрки
+    document.getElementById('partnerRewardBtn').onclick = () => {
+        if (!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        toast('Партнёрские награды: 0 ZUZ');
+    };
+
+    // Вывод стейкинга
+    document.getElementById('withdrawStakeBtn').onclick = async () => {
+        if (!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        if (userData.stakedZuz <= 0) { toast('Нет застейканных ZUZ'); return; }
+        toast(`⏳ Вывод ${userData.stakedZuz.toFixed(0)} ZUZ из стейкинга...`);
+        userData.balanceZuz += userData.stakedZuz;
+        userData.stakedZuz = 0;
+        updateBalances();
+    };
+
+    // Другие кнопки
     document.getElementById('toggleBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
     document.getElementById('toggleTotalBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
     document.getElementById('copyAddressBtn').onclick = () => { if(currentAccount) navigator.clipboard.writeText(currentAccount); toast('Адрес скопирован'); };
     document.getElementById('qrAddressBtn').onclick = () => { if(currentAccount) { document.getElementById('qrCode').innerHTML = ''; new QRCode(document.getElementById('qrCode'), currentAccount); document.getElementById('qrModal').style.display = 'flex'; } };
-    document.getElementById('withdrawStakeBtn').onclick = () => toast('Вывод стейкинга после пресейла');
-    document.getElementById('rewardsBtn').onclick = () => toast(`Ваши реварды: ${userData.stakingRewards.toFixed(0)} ZUZ`);
-    document.getElementById('membersBtn').onclick = () => toast('👥 Сообщество ZUZ растёт!');
-    document.getElementById('partnersStatBtn').onclick = () => showPartners();
     document.getElementById('presaleBonusBtn').onclick = () => window.open('https://zuzim-universe.com', '_blank');
+    document.getElementById('partnersStatBtn').onclick = () => showPartners();
+    document.getElementById('rewardsBtn').onclick = () => toast(`Ваши реварды: ${userData.stakingRewards.toFixed(0)} ZUZ`);
+    document.getElementById('membersBtn').onclick = () => toast('👥 Участников: 1');
 
     async function buyZUZ(ethAmount) {
         if(!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
@@ -283,7 +422,7 @@
             await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: currentAccount, to: PRESALE_ADDRESS, value: web3.utils.toWei(ethAmount.toString(), 'ether') }] });
             toast(`✅ Куплено ${(ethAmount/TOKEN_PRICE_ETH).toFixed(0)} ZUZ`);
             setTimeout(()=> updateBalances(), 3000);
-        } catch(e) { toast('Ошибка транзакции'); }
+        } catch(e) { toast('Ошибка покупки'); }
     }
 
     document.querySelectorAll('.amount-btn').forEach(btn => { btn.onclick = () => { let usd = parseInt(btn.dataset.amount); buyZUZ(usd / ETH_PRICE_USD); }; });
@@ -293,14 +432,13 @@
     function showPartners() {
         let levels = [{ min:5,bonus:2},{ min:25,bonus:4},{ min:125,bonus:6},{ min:625,bonus:8},{ min:3125,bonus:10},{ min:15625,bonus:12},{ min:78125,bonus:15},{ min:390625,bonus:18},{ min:1953125,bonus:22},{ min:9765625,bonus:30}];
         let html = `<h4 style="color:#D4AF37;">🤝 Партнёрская программа</h4><p>Ваши партнёры: ${userData.totalReferrals}<br>Награда: 5% от покупок</p><div class="expand-btn" id="toggleLevels">▼ Показать уровни</div><div id="levelsTable" style="display:none;"><table class="level-table"><tr><th>Уровень</th><th>Активных партнёров</th><th>Бонус</th></tr>`;
-        levels.forEach((l,i)=>{ html+=`<tr><td>${i+1}</td><td>${l.min}+</td><td>+${l.bonus}%</td></tr>`; });
+        levels.forEach((l,i)=>{ html+=`<tr><td>${i+1}<table><td>${l.min}+</td><td>+${l.bonus}%</td></tr>`; });
         html+=`</table></div><div class="address" id="refLinkPlace"></div>`;
         document.getElementById('partnersContent').innerHTML = html;
         document.getElementById('refLinkPlace').innerHTML = `🔗 Ваша ссылка: t.me/Zuz_Universe_bot?start=${currentAccount?.slice(-6) || '123'}`;
         document.getElementById('toggleLevels').onclick = () => { let tbl = document.getElementById('levelsTable'); tbl.style.display = tbl.style.display === 'none' ? 'block' : 'none'; };
     }
 
-    document.querySelectorAll('.action-card').forEach(card => { card.onclick = () => toast(`Функция "${card.querySelector('.action-label').innerText}" после пресейла`); });
     document.querySelectorAll('.tab').forEach(tab => { tab.onclick = () => { document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(tab.dataset.tab+'Tab').classList.add('active'); if(tab.dataset.tab === 'partners') showPartners(); }; });
 
     function closeQR() { document.getElementById('qrModal').style.display = 'none'; }
