@@ -148,10 +148,10 @@
     <div id="activityTab" class="tab-content"><div class="card" id="activityList">📭 Нет активности</div></div>
     <div id="partnersTab" class="tab-content"><div class="card" id="partnersContent"></div></div>
 
-    <!-- НОВЫЙ БАННЕР С ПОДАРКОМ -->
-    <div class="footer-banner" id="presaleBonusBtn" onclick="window.open('https://zuzim-universe.com', '_blank')">
-    🎁 1000 ZUZ в подарок → 
-</div>
+    <!-- НОВАЯ КНОПКА - ВЕДЁТ НА ГЛАВНУЮ СТРАНИЦУ САЙТА -->
+    <div class="footer-banner" id="presaleBonusBtn">
+        🎁 1000 ZUZ в подарок → 
+    </div>
 </div>
 
 <div id="qrModal" class="modal"><div class="modal-content"><div id="qrCode"></div><button class="btn-small btn-secondary" onclick="closeQR()">Закрыть</button></div></div>
@@ -331,61 +331,4 @@
         document.getElementById('currentRank').innerHTML = current.name;
         document.getElementById('nextRank').innerHTML = next ? `→ ${next.name}: ${next.threshold.toLocaleString()} ZUZ` : '👑 Бессмертие';
         document.getElementById('sageProgress').style.width = Math.min(percent,100) + '%';
-        document.getElementById('stakingRewards').innerHTML = userData.stakingRewards.toFixed(0)+' ZUZ';
-        document.getElementById('rewardsAmount').innerHTML = userData.stakingRewards.toFixed(0);
-    }
-
-    async function buyZUZ(ethAmount) {
-        if(!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
-        if(ethAmount < 0.01) { toast('Минимум 0.01 ETH'); return; }
-        let wei = web3.utils.toWei(ethAmount.toString(), 'ether');
-        try {
-            await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: currentAccount, to: PRESALE_ADDRESS, value: wei }] });
-            let zuzAmount = ethAmount / TOKEN_PRICE_ETH;
-            toast(`✅ Куплено ${zuzAmount.toFixed(0)} ZUZ`);
-            setTimeout(()=> updateBalances(), 3000);
-        } catch(e) { toast('Ошибка транзакции'); }
-    }
-
-    document.getElementById('toggleBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
-    document.getElementById('toggleTotalBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
-    document.getElementById('copyAddressBtn').onclick = () => { if(currentAccount) navigator.clipboard.writeText(currentAccount); toast('Адрес скопирован'); };
-    document.getElementById('qrAddressBtn').onclick = () => { if(currentAccount) { document.getElementById('qrCode').innerHTML = ''; new QRCode(document.getElementById('qrCode'), currentAccount); document.getElementById('qrModal').style.display = 'flex'; } };
-    document.getElementById('withdrawStakeBtn').onclick = () => toast('Вывод стейкинга после пресейла');
-    document.getElementById('rewardsBtn').onclick = () => toast(`Ваши реварды: ${userData.stakingRewards.toFixed(0)} ZUZ`);
-    document.getElementById('membersBtn').onclick = () => toast('👥 Сообщество ZUZ растёт!');
-    document.getElementById('partnersStatBtn').onclick = () => showPartners();
-
-    // НОВАЯ КНОПКА - 1000 ZUZ В ПОДАРОК
-    document.getElementById('presaleBonusBtn').onclick = () => {
-        window.open('https://zuzim-universe.com/presale#bonus', '_blank');
-    };
-
-    document.querySelectorAll('.amount-btn').forEach(btn => { btn.onclick = () => { let usd = parseInt(btn.dataset.amount); let eth = usd / ETH_PRICE_USD; buyZUZ(eth); }; });
-    document.getElementById('buyEthBtn').onclick = () => { let eth = parseFloat(document.getElementById('customEthAmount').value); if(eth) buyZUZ(eth); };
-    document.getElementById('buyUsdtBtn').onclick = () => toast('Покупка за USDT через агрегатор');
-
-    function showPartners() {
-        let levels = [{ min:5,bonus:2},{ min:25,bonus:4},{ min:125,bonus:6},{ min:625,bonus:8},{ min:3125,bonus:10},{ min:15625,bonus:12},{ min:78125,bonus:15},{ min:390625,bonus:18},{ min:1953125,bonus:22},{ min:9765625,bonus:30}];
-        let html = `<h4 style="color:#D4AF37;">🤝 Партнёрская программа</h4><p>Ваши партнёры: ${userData.totalReferrals}<br>Награда: 5% от покупок</p><div class="expand-btn" id="toggleLevels">▼ Показать уровни</div><div id="levelsTable" style="display:none;"><table class="level-table"><tr><th>Уровень</th><th>Активных партнёров</th><th>Бонус</th></tr>`;
-        levels.forEach((l,i)=>{ html+=`<tr><td>${i+1}</td><td>${l.min}+</td><td>+${l.bonus}%</td></tr>`; });
-        html+=`</table></div><div class="address" id="refLinkPlace"></div>`;
-        document.getElementById('partnersContent').innerHTML = html;
-        document.getElementById('refLinkPlace').innerHTML = `🔗 Ваша ссылка: t.me/Zuz_Universe_bot?start=${currentAccount?.slice(-6) || '123'}`;
-        document.getElementById('toggleLevels').onclick = () => { let tbl = document.getElementById('levelsTable'); tbl.style.display = tbl.style.display === 'none' ? 'block' : 'none'; };
-    }
-
-    document.querySelectorAll('.action-card').forEach(card => { card.onclick = () => toast(`Функция "${card.querySelector('.action-label').innerText}" после пресейла`); });
-    document.querySelectorAll('.tab').forEach(tab => { tab.onclick = () => { document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(tab.dataset.tab+'Tab').classList.add('active'); if(tab.dataset.tab === 'partners') showPartners(); }; });
-
-    function closeQR() { document.getElementById('qrModal').style.display = 'none'; }
-    window.closeQR = closeQR;
-    async function loadUserData() { await updateBalances(); }
-    setInterval(() => { if(currentAccount) updateBalances(); }, 15000);
-
-    setTimeout(async () => { if (window.ethereum) { try { const accounts = await window.ethereum.request({ method: 'eth_accounts' }); if (accounts && accounts.length > 0) { if (window.ethereum.isMetaMask) currentProvider = 'metamask'; else if (window.ethereum.isTrust) currentProvider = 'trust'; else if (window.ethereum.isCoinbaseWallet) currentProvider = 'coinbase'; await connectWithAccounts(accounts, window.ethereum); window.ethereum.on('accountsChanged', handleAccountsChanged); } } catch(e) {} } }, 500);
-
-    checkPin();
-</script>
-</body>
-</html>
+        document.getElementById('stakingRewards').innerHTML
