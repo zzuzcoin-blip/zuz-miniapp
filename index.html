@@ -93,7 +93,6 @@
         <button class="btn-small btn-secondary" id="connectBtn">🔌 Кошелёк</button>
     </div>
 
-    <!-- 3 кнопки -->
     <div class="flex-between" style="gap:10px; margin-bottom:16px;">
         <div class="card" style="flex:1; text-align:center; padding:12px; cursor:pointer;" id="rewardsBtn"><div class="stat-value" id="rewardsAmount">0</div><div style="font-size:10px;">Реварды (ZUZ)</div></div>
         <div class="card" style="flex:1; text-align:center; padding:12px; cursor:pointer;" id="membersBtn"><div class="stat-value" id="membersCount">3475</div><div style="font-size:10px;">Участники</div></div>
@@ -144,13 +143,12 @@
         <div class="input-group"><input type="number" id="customUsdtAmount" placeholder="Сумма в USDT"><button class="btn-small" id="buyUsdtBtn">Купить за USDT</button></div></div>
     </div>
 
-    <div id="nftTab" class="tab-content"><div class="card" style="text-align:center;">🎨 NFT коллекция "7 Мудрецов" скоро</div></div>
+    <div id="nftTab" class="tab-content"><div class="card" style="text-align:center;">🎨 NFT коллекция скоро</div></div>
     <div id="activityTab" class="tab-content"><div class="card" id="activityList">📭 Нет активности</div></div>
     <div id="partnersTab" class="tab-content"><div class="card" id="partnersContent"></div></div>
 
-    <!-- НОВАЯ КНОПКА - ВЕДЁТ НА ГЛАВНУЮ СТРАНИЦУ САЙТА -->
     <div class="footer-banner" id="presaleBonusBtn">
-        🎁 1000 ZUZ в подарок → 
+        🎁 1000 ZUZ в подарок →
     </div>
 </div>
 
@@ -158,138 +156,15 @@
 <div id="toast" class="toast"></div>
 
 <script>
-    // ========== КОНФИГ ==========
     const TOKEN_ADDRESS = '0x87D336511760583B11B87866654c6f7253c1cB0D';
     const PRESALE_ADDRESS = '0x8CdeBa5Db0a4046D8BBC655244173750c7DFd553';
     const TOKEN_PRICE_ETH = 0.0001;
     const WEBSITE = 'https://zuzim-universe.com';
     const ETH_PRICE_USD = 3500;
     const ZUZ_PRICE_USD = 0.01;
-
     const TOKEN_ABI = [{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"}];
 
-    // ========== ПОДКЛЮЧЕНИЕ КОШЕЛЬКОВ ==========
-    let currentAccount = null;
-    let currentProvider = null;
-    let walletConnectProvider = null;
-    let web3 = null;
-    let tokenContract = null;
-
-    function isMobile() { return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent); }
-    function getProvider() { if (currentProvider === 'walletconnect' && walletConnectProvider) return walletConnectProvider; return window.ethereum; }
-    function toast(msg) { let t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
-
-    async function connectWithAccounts(accounts, provider) {
-        if (!accounts || accounts.length === 0) return;
-        currentAccount = accounts[0];
-        web3 = new Web3(provider);
-        tokenContract = new web3.eth.Contract(TOKEN_ABI, TOKEN_ADDRESS);
-        document.getElementById('walletAddressDisplay').innerHTML = currentAccount.slice(0,6)+'...'+currentAccount.slice(-4);
-        document.getElementById('connectBtn').innerHTML = '✅ ' + currentAccount.slice(0,6)+'...'+currentAccount.slice(-4);
-        toast('✅ Кошелёк подключён');
-        await updateBalances();
-    }
-
-    function handleAccountsChanged(accounts) {
-        if (accounts.length === 0) { disconnectWallet(); }
-        else { currentAccount = accounts[0]; document.getElementById('walletAddressDisplay').innerHTML = currentAccount.slice(0,6)+'...'+currentAccount.slice(-4); document.getElementById('connectBtn').innerHTML = '✅ ' + currentAccount.slice(0,6)+'...'+currentAccount.slice(-4); updateBalances(); }
-    }
-
-    function disconnectWallet() {
-        if (walletConnectProvider) { walletConnectProvider.disconnect().catch(()=>{}); walletConnectProvider = null; }
-        if (window.ethereum) { window.ethereum.removeListener('accountsChanged', handleAccountsChanged); }
-        currentAccount = null; currentProvider = null; web3 = null; tokenContract = null;
-        document.getElementById('connectBtn').innerHTML = '🔌 Кошелёк';
-        document.getElementById('walletAddressDisplay').innerHTML = 'Не подключён';
-        toast('Кошелёк отключён');
-    }
-
-    async function connectMetaMask() {
-        if (!window.ethereum || !window.ethereum.isMetaMask) {
-            if (isMobile()) { window.location.href = `https://metamask.app.link/dapp/${window.location.href.replace(/^https?:\/\//, '')}`; return; }
-            else { toast('Установите MetaMask'); window.open('https://metamask.io/download/', '_blank'); return; }
-        }
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            if (accounts && accounts.length > 0) { currentProvider = 'metamask'; await connectWithAccounts(accounts, window.ethereum); window.ethereum.on('accountsChanged', handleAccountsChanged); window.ethereum.on('chainChanged', () => window.location.reload()); }
-        } catch(e) { toast('Ошибка MetaMask: ' + (e.message || 'Unknown')); }
-    }
-
-    async function connectTrustWallet() {
-        const isTrust = window.ethereum && window.ethereum.isTrust;
-        if (isTrust) {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                if (accounts && accounts.length > 0) { currentProvider = 'trust'; await connectWithAccounts(accounts, window.ethereum); window.ethereum.on('accountsChanged', handleAccountsChanged); window.ethereum.on('chainChanged', () => window.location.reload()); }
-            } catch(e) { toast('Trust Wallet ошибка'); }
-        } else if (isMobile()) { window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`; setTimeout(() => { if (!currentAccount) toast('Открываем Trust Wallet...'); }, 1000); }
-        else { await connectWalletConnect(); }
-    }
-
-    async function connectCoinbaseWallet() {
-        const isCoinbase = window.ethereum && window.ethereum.isCoinbaseWallet;
-        if (isCoinbase) {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                if (accounts && accounts.length > 0) { currentProvider = 'coinbase'; await connectWithAccounts(accounts, window.ethereum); window.ethereum.on('accountsChanged', handleAccountsChanged); window.ethereum.on('chainChanged', () => window.location.reload()); }
-            } catch(e) { toast('Coinbase ошибка'); }
-        } else if (isMobile()) { window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}`; }
-        else { window.open('https://www.coinbase.com/wallet/downloads', '_blank'); toast('Установите Coinbase Wallet'); }
-    }
-
-    function waitForWalletConnectScript() {
-        return new Promise((resolve, reject) => {
-            let attempts = 0;
-            const check = () => { attempts++; const Provider = window['@walletconnect/ethereum-provider']?.EthereumProvider; if (Provider) resolve(Provider); else if (attempts >= 100) reject(new Error('Timeout')); else setTimeout(check, 100); };
-            check();
-        });
-    }
-
-    async function connectWalletConnect() {
-        toast('Загрузка WalletConnect...');
-        try {
-            const Provider = await waitForWalletConnectScript();
-            walletConnectProvider = await Provider.init({ projectId: 'ad01e4465a19e847abe4ac7c4097d10c', chains: [1], showQrModal: true, methods: ['eth_sendTransaction'], events: ['chainChanged', 'accountsChanged'], metadata: { name: "ZUZ Universe", description: "ZUZ Ecosystem", url: window.location.origin, icons: [] } });
-            await walletConnectProvider.enable();
-            const accounts = walletConnectProvider.accounts;
-            if (accounts && accounts.length > 0) { currentProvider = 'walletconnect'; await connectWithAccounts(accounts, walletConnectProvider); walletConnectProvider.on('accountsChanged', handleAccountsChanged); walletConnectProvider.on('disconnect', disconnectWallet); }
-        } catch(e) { toast('WalletConnect ошибка'); }
-    }
-
-    function openWalletModal() {
-        const modal = document.createElement('div'); modal.className = 'modal'; modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><div class="modal-title">Подключить кошелёк</div><button class="close-modal" onclick="this.closest('.modal').remove()">&times;</button></div><div class="wallet-options"><div class="wallet-option-item" onclick="window.connectMetaMask(); this.closest('.modal').remove();"><span>🦊 MetaMask</span><div class="wallet-badge">Popular</div></div><div class="wallet-option-item" onclick="window.connectTrustWallet(); this.closest('.modal').remove();"><span>📱 Trust Wallet</span><div class="wallet-badge">Mobile</div></div><div class="wallet-option-item" onclick="window.connectCoinbaseWallet(); this.closest('.modal').remove();"><span>💰 Coinbase</span><div class="wallet-badge">Secure</div></div><div class="wallet-option-item" onclick="window.connectWalletConnect(); this.closest('.modal').remove();"><span>🔗 WalletConnect</span><div class="wallet-badge">300+</div></div></div><p style="font-size:12px; margin-top:15px;">Нет кошелька? <a href="https://metamask.io" target="_blank" style="color:#D4AF37;">Установить MetaMask</a></p></div>`;
-        document.body.appendChild(modal);
-    }
-
-    document.getElementById('connectBtn').onclick = openWalletModal;
-    window.connectMetaMask = connectMetaMask;
-    window.connectTrustWallet = connectTrustWallet;
-    window.connectCoinbaseWallet = connectCoinbaseWallet;
-    window.connectWalletConnect = connectWalletConnect;
-    window.disconnectWallet = disconnectWallet;
-
-    // ========== PIN-КОД ==========
-    let savedPin = localStorage.getItem('zuz_user_pin');
-    let isCreatingPin = false;
-    let pinInput = '';
-    const pinScreen = document.getElementById('pinScreen');
-    const appContainer = document.getElementById('appContainer');
-    const pinDotsEl = document.querySelectorAll('.pin-dot');
-    const pinTitleEl = document.getElementById('pinTitle');
-
-    function updatePinDots() { pinDotsEl.forEach((d,i)=> i<pinInput.length ? d.classList.add('filled') : d.classList.remove('filled')); }
-    function clearPinInput() { pinInput = ''; updatePinDots(); }
-    function checkPin() { if (!savedPin) { isCreatingPin = true; pinTitleEl.innerText = '✨ Создайте PIN-код (4 цифры)'; clearPinInput(); } else { isCreatingPin = false; pinTitleEl.innerText = '🔐 Введите PIN-код'; clearPinInput(); } }
-    function saveNewPin() { if (pinInput.length === 4) { localStorage.setItem('zuz_user_pin', pinInput); savedPin = pinInput; toast('✅ PIN сохранён'); enterApp(); } else { toast('PIN должен быть 4 цифры'); clearPinInput(); } }
-    function verifyPin() { if (pinInput === savedPin) { enterApp(); } else { toast('❌ Неверный PIN'); clearPinInput(); } }
-    function enterApp() { pinScreen.style.display = 'none'; appContainer.style.display = 'block'; if (window.Telegram?.WebApp) window.Telegram.WebApp.ready(); loadUserData(); }
-    function resetPin() { if (confirm('Сбросить PIN?')) { localStorage.removeItem('zuz_user_pin'); savedPin = null; pinScreen.style.display = 'flex'; appContainer.style.display = 'none'; checkPin(); clearPinInput(); } }
-    document.getElementById('resetPinBtn').onclick = resetPin;
-
-    document.querySelectorAll('.pin-key').forEach(key => { key.onclick = () => { let num = key.dataset.num; if (num === 'delete') { pinInput = pinInput.slice(0,-1); updatePinDots(); } else if (num === 'enter') { if (isCreatingPin) saveNewPin(); else verifyPin(); } else if (pinInput.length < 4) { pinInput += num; updatePinDots(); } }; });
-
-    // ========== ОСНОВНОЙ ФУНКЦИОНАЛ ==========
+    let currentAccount = null, currentProvider = null, walletConnectProvider = null, web3 = null, tokenContract = null;
     let showBalance = true;
     let userData = { balanceZuz: 0, stakedZuz: 0, stakingRewards: 0, totalReferrals: 0 };
 
@@ -303,6 +178,9 @@
         { name: "⚔️ Power", threshold: 100000, bonus: 25, next: 250000 },
         { name: "👑 Immortality", threshold: 250000, bonus: 30, next: Infinity }
     ];
+
+    function isMobile() { return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent); }
+    function toast(msg) { let t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
 
     async function updateBalances() {
         if (!web3 || !currentAccount) return;
@@ -319,16 +197,136 @@
             document.getElementById('zuzUSD').innerHTML = showBalance ? `$${(zuz*ZUZ_PRICE_USD).toFixed(2)}` : '***';
             document.getElementById('zuzBalance').innerHTML = showBalance ? zuz.toFixed(0) : '***';
             document.getElementById('totalUSD').innerHTML = showBalance ? `$${totalUSD.toFixed(2)}` : '***';
-            updateSage(zuz);
+            
+            let current = sageLevels[0];
+            for(let l of sageLevels) if(zuz >= l.threshold) current = l;
+            let next = sageLevels.find(l => l.threshold > zuz);
+            let percent = next ? ((zuz - current.threshold) / (next.threshold - current.threshold)) * 100 : 100;
+            document.getElementById('currentRank').innerHTML = current.name;
+            document.getElementById('nextRank').innerHTML = next ? `→ ${next.name}: ${next.threshold.toLocaleString()} ZUZ` : '👑 Бессмертие';
+            document.getElementById('sageProgress').style.width = Math.min(percent,100) + '%';
+            document.getElementById('stakingRewards').innerHTML = userData.stakingRewards.toFixed(0)+' ZUZ';
+            document.getElementById('rewardsAmount').innerHTML = userData.stakingRewards.toFixed(0);
         } catch(e) { console.log(e); }
     }
 
-    function updateSage(balance) {
-        let current = sageLevels[0];
-        for(let l of sageLevels) if(balance >= l.threshold) current = l;
-        let next = sageLevels.find(l => l.threshold > balance);
-        let percent = next ? ((balance - current.threshold) / (next.threshold - current.threshold)) * 100 : 100;
-        document.getElementById('currentRank').innerHTML = current.name;
-        document.getElementById('nextRank').innerHTML = next ? `→ ${next.name}: ${next.threshold.toLocaleString()} ZUZ` : '👑 Бессмертие';
-        document.getElementById('sageProgress').style.width = Math.min(percent,100) + '%';
-        document.getElementById('stakingRewards').innerHTML
+    async function connectWithAccounts(accounts, provider) {
+        if (!accounts || accounts.length === 0) return;
+        currentAccount = accounts[0];
+        web3 = new Web3(provider);
+        tokenContract = new web3.eth.Contract(TOKEN_ABI, TOKEN_ADDRESS);
+        document.getElementById('walletAddressDisplay').innerHTML = currentAccount.slice(0,6)+'...'+currentAccount.slice(-4);
+        document.getElementById('connectBtn').innerHTML = '✅ ' + currentAccount.slice(0,6)+'...'+currentAccount.slice(-4);
+        toast('✅ Кошелёк подключён');
+        await updateBalances();
+    }
+
+    async function connectMetaMask() {
+        if (!window.ethereum || !window.ethereum.isMetaMask) {
+            if (isMobile()) { window.location.href = `https://metamask.app.link/dapp/${window.location.href.replace(/^https?:\/\//, '')}`; return; }
+            else { toast('Установите MetaMask'); window.open('https://metamask.io/download/', '_blank'); return; }
+        }
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            if (accounts && accounts.length > 0) { currentProvider = 'metamask'; await connectWithAccounts(accounts, window.ethereum); window.ethereum.on('accountsChanged', (acc) => { if(acc.length) { currentAccount=acc[0]; updateBalances(); } else disconnectWallet(); }); }
+        } catch(e) { toast('Ошибка MetaMask'); }
+    }
+
+    async function connectTrustWallet() {
+        if (window.ethereum && window.ethereum.isTrust) {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts && accounts.length > 0) { currentProvider = 'trust'; await connectWithAccounts(accounts, window.ethereum); }
+            } catch(e) { toast('Trust Wallet ошибка'); }
+        } else if (isMobile()) { window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`; setTimeout(() => { if (!currentAccount) toast('Открываем Trust Wallet...'); }, 1000); }
+        else { toast('Trust Wallet не найден'); }
+    }
+
+    async function connectCoinbaseWallet() {
+        if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts && accounts.length > 0) { currentProvider = 'coinbase'; await connectWithAccounts(accounts, window.ethereum); }
+            } catch(e) { toast('Coinbase ошибка'); }
+        } else if (isMobile()) { window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}`; }
+        else { window.open('https://www.coinbase.com/wallet/downloads', '_blank'); toast('Установите Coinbase Wallet'); }
+    }
+
+    function disconnectWallet() {
+        currentAccount = null; web3 = null; tokenContract = null;
+        document.getElementById('connectBtn').innerHTML = '🔌 Кошелёк';
+        document.getElementById('walletAddressDisplay').innerHTML = 'Не подключён';
+        toast('Кошелёк отключён');
+    }
+
+    function openWalletModal() {
+        const modal = document.createElement('div'); modal.className = 'modal'; modal.style.display = 'flex';
+        modal.innerHTML = `<div class="modal-content"><div class="modal-header"><div class="modal-title">Подключить кошелёк</div><button class="close-modal" onclick="this.closest('.modal').remove()">&times;</button></div><div class="wallet-options"><div class="wallet-option-item" onclick="connectMetaMask(); this.closest('.modal').remove();"><span>🦊 MetaMask</span><div class="wallet-badge">Popular</div></div><div class="wallet-option-item" onclick="connectTrustWallet(); this.closest('.modal').remove();"><span>📱 Trust Wallet</span><div class="wallet-badge">Mobile</div></div><div class="wallet-option-item" onclick="connectCoinbaseWallet(); this.closest('.modal').remove();"><span>💰 Coinbase</span><div class="wallet-badge">Secure</div></div></div><p style="font-size:12px; margin-top:15px;">Нет кошелька? <a href="https://metamask.io" target="_blank" style="color:#D4AF37;">Установить MetaMask</a></p></div>`;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById('connectBtn').onclick = openWalletModal;
+    document.getElementById('toggleBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
+    document.getElementById('toggleTotalBalance').onclick = () => { showBalance = !showBalance; updateBalances(); };
+    document.getElementById('copyAddressBtn').onclick = () => { if(currentAccount) navigator.clipboard.writeText(currentAccount); toast('Адрес скопирован'); };
+    document.getElementById('qrAddressBtn').onclick = () => { if(currentAccount) { document.getElementById('qrCode').innerHTML = ''; new QRCode(document.getElementById('qrCode'), currentAccount); document.getElementById('qrModal').style.display = 'flex'; } };
+    document.getElementById('withdrawStakeBtn').onclick = () => toast('Вывод стейкинга после пресейла');
+    document.getElementById('rewardsBtn').onclick = () => toast(`Ваши реварды: ${userData.stakingRewards.toFixed(0)} ZUZ`);
+    document.getElementById('membersBtn').onclick = () => toast('👥 Сообщество ZUZ растёт!');
+    document.getElementById('partnersStatBtn').onclick = () => showPartners();
+    document.getElementById('presaleBonusBtn').onclick = () => window.open('https://zuzim-universe.com', '_blank');
+
+    async function buyZUZ(ethAmount) {
+        if(!currentAccount) { toast('Подключите кошелёк'); openWalletModal(); return; }
+        if(ethAmount < 0.01) { toast('Минимум 0.01 ETH'); return; }
+        try {
+            await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: currentAccount, to: PRESALE_ADDRESS, value: web3.utils.toWei(ethAmount.toString(), 'ether') }] });
+            toast(`✅ Куплено ${(ethAmount/TOKEN_PRICE_ETH).toFixed(0)} ZUZ`);
+            setTimeout(()=> updateBalances(), 3000);
+        } catch(e) { toast('Ошибка транзакции'); }
+    }
+
+    document.querySelectorAll('.amount-btn').forEach(btn => { btn.onclick = () => { let usd = parseInt(btn.dataset.amount); buyZUZ(usd / ETH_PRICE_USD); }; });
+    document.getElementById('buyEthBtn').onclick = () => { let eth = parseFloat(document.getElementById('customEthAmount').value); if(eth) buyZUZ(eth); };
+    document.getElementById('buyUsdtBtn').onclick = () => toast('Покупка за USDT через агрегатор');
+
+    function showPartners() {
+        let levels = [{ min:5,bonus:2},{ min:25,bonus:4},{ min:125,bonus:6},{ min:625,bonus:8},{ min:3125,bonus:10},{ min:15625,bonus:12},{ min:78125,bonus:15},{ min:390625,bonus:18},{ min:1953125,bonus:22},{ min:9765625,bonus:30}];
+        let html = `<h4 style="color:#D4AF37;">🤝 Партнёрская программа</h4><p>Ваши партнёры: ${userData.totalReferrals}<br>Награда: 5% от покупок</p><div class="expand-btn" id="toggleLevels">▼ Показать уровни</div><div id="levelsTable" style="display:none;"><table class="level-table"><tr><th>Уровень</th><th>Активных партнёров</th><th>Бонус</th></tr>`;
+        levels.forEach((l,i)=>{ html+=`<tr><td>${i+1}</td><td>${l.min}+</td><td>+${l.bonus}%</td></tr>`; });
+        html+=`</table></div><div class="address" id="refLinkPlace"></div>`;
+        document.getElementById('partnersContent').innerHTML = html;
+        document.getElementById('refLinkPlace').innerHTML = `🔗 Ваша ссылка: t.me/Zuz_Universe_bot?start=${currentAccount?.slice(-6) || '123'}`;
+        document.getElementById('toggleLevels').onclick = () => { let tbl = document.getElementById('levelsTable'); tbl.style.display = tbl.style.display === 'none' ? 'block' : 'none'; };
+    }
+
+    document.querySelectorAll('.action-card').forEach(card => { card.onclick = () => toast(`Функция "${card.querySelector('.action-label').innerText}" после пресейла`); });
+    document.querySelectorAll('.tab').forEach(tab => { tab.onclick = () => { document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(tab.dataset.tab+'Tab').classList.add('active'); if(tab.dataset.tab === 'partners') showPartners(); }; });
+
+    function closeQR() { document.getElementById('qrModal').style.display = 'none'; }
+    window.closeQR = closeQR;
+
+    // PIN-код
+    let savedPin = localStorage.getItem('zuz_user_pin');
+    let isCreatingPin = false;
+    let pinInput = '';
+    const pinScreen = document.getElementById('pinScreen');
+    const appContainer = document.getElementById('appContainer');
+    const pinDotsEl = document.querySelectorAll('.pin-dot');
+    const pinTitleEl = document.getElementById('pinTitle');
+
+    function updatePinDots() { pinDotsEl.forEach((d,i)=> i<pinInput.length ? d.classList.add('filled') : d.classList.remove('filled')); }
+    function clearPinInput() { pinInput = ''; updatePinDots(); }
+    function checkPin() { if (!savedPin) { isCreatingPin = true; pinTitleEl.innerText = '✨ Создайте PIN-код (4 цифры)'; clearPinInput(); } else { isCreatingPin = false; pinTitleEl.innerText = '🔐 Введите PIN-код'; clearPinInput(); } }
+    function saveNewPin() { if (pinInput.length===4) { localStorage.setItem('zuz_user_pin', pinInput); savedPin=pinInput; toast('✅ PIN сохранён'); enterApp(); } else toast('PIN должен быть 4 цифры'); }
+    function verifyPin() { if (pinInput===savedPin) enterApp(); else { toast('❌ Неверный PIN'); clearPinInput(); } }
+    function enterApp() { pinScreen.style.display='none'; appContainer.style.display='block'; if(window.Telegram?.WebApp) window.Telegram.WebApp.ready(); updateBalances(); }
+    function resetPin() { if(confirm('Сбросить PIN?')) { localStorage.removeItem('zuz_user_pin'); savedPin=null; pinScreen.style.display='flex'; appContainer.style.display='none'; checkPin(); clearPinInput(); } }
+    document.getElementById('resetPinBtn').onclick = resetPin;
+    document.querySelectorAll('.pin-key').forEach(key => { key.onclick = () => { let num = key.dataset.num; if (num==='delete') { pinInput = pinInput.slice(0,-1); updatePinDots(); } else if (num==='enter') { if(isCreatingPin) saveNewPin(); else verifyPin(); } else if(pinInput.length<4) { pinInput += num; updatePinDots(); } }; });
+    
+    checkPin();
+    setTimeout(async () => { if(window.ethereum) { const acc = await window.ethereum.request({ method: 'eth_accounts' }); if(acc && acc.length) connectWithAccounts(acc, window.ethereum); } }, 500);
+</script>
+</body>
+</html>
